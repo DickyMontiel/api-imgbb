@@ -65,7 +65,7 @@
         public function __construct($archivo){
             if(isset($archivo)){
                 $host = "KipuStudios"; //Escribe el nombre de tu empresa
-                $llave = "8ebe673d49502b9fc3c1c2f8dee50a5b"; //Ingresa la llave que te dió imgbb
+                $llave = ""; //Ingresa la llave que te dió imgbb
 
                 $bin = file_get_contents($archivo["tmp_name"]);
                 $base64 = base64_encode($bin);
