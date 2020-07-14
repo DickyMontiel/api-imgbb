@@ -9,68 +9,68 @@
         Se necesita que te crees una cuenta y generes una llave para hacer la petición aqui:
         https://api.imgbb.com/ 
 
+        Coloca la llave que te dio la pagina en la variable $llave dentro de la funcion upload
+
         Contacto:
         Facebook: Frederick Eduardo Montiel Tortola
         Correo: fmontiel@easyprojects.tech
 
-        Este es un ejemplo del resultado que dará:
-        Para acceder a la url de la imagen, en el array donde esta lo que retorna esta api tienes que llamar al array
-        donde guardaste los datos y a continuacion esto:
+        Usa este codigo en el archivo donde lo pondras:
 
-        {
-            "data": {
-                "id": "2ndCYJK",
-                "url_viewer": "https://ibb.co/2ndCYJK",
-                "url": "https://i.ibb.co/w04Prt6/c1f64245afb2.gif",
-                "display_url": "https://i.ibb.co/98W13PY/c1f64245afb2.gif",
-                "title": "c1f64245afb2",
-                "time": "1552042565",
-                "expiration":"0",
-                "image": {
-                "filename": "c1f64245afb2.gif",
-                "name": "c1f64245afb2",
-                "mime": "image/gif",
-                "extension": "gif",
-                "url": "https://i.ibb.co/w04Prt6/c1f64245afb2.gif",
-                "size": 42
-            },
+            require("Ruta/api.imgbb.easyprojects.php");
+            $apiImgBB = new ApiImgBB;
 
-            "thumb": {
-                "filename": "c1f64245afb2.gif",
-                "name": "c1f64245afb2",
-                "mime": "image/gif",
-                "extension": "gif",
-                "url": "https://i.ibb.co/2ndCYJK/c1f64245afb2.gif",
-                "size": "42"
-                },
-                "medium": {
-                "filename": "c1f64245afb2.gif",
-                "name": "c1f64245afb2",
-                "mime": "image/gif",
-                "extension": "gif",
-                "url": "https://i.ibb.co/98W13PY/c1f64245afb2.gif",
-                "size": "43"
-            },
+        Verifica si es una imagen con:
 
-            "delete_url": "https://ibb.co/2ndCYJK/670a7e48ddcb85ac340c717a41047e5c"
-        },  
-            "success": true,
-            "status": 200
-        }
+            $apiImgBB->isImage($ArchivoQueSubio); ///Devuelve un booleano True o False
+
+        Para subir la imagen a ImgBB usa:
+
+            $apiImgBB->upload(); //Sube la imagen
+
+        No tienes que integrar un parametro en la funcion de Cargar Imagen ya que se guarda en una variable al 
+        verificar la imagen.
+
+        Para obtener la url de la imagen debes usar la siguiente funcion que te devolverá una variable
+        de tipo texto en la que se encuentra la url:
+
+        $datoObtenido = $apiImgBB->getUrl(); //Devuelve la url
+
+        Ahora usa la url en la variable que creaste de $datoObtenido
     */
 
     class ApiImgBB{
         private $json;
 
-        public function __construct($archivo){
-            if(isset($archivo)){
-                $host = "KipuStudios"; //Escribe el nombre de tu empresa
-                $llave = ""; //Ingresa la llave que te dió imgbb
+        private $archivo;
 
-                $bin = file_get_contents($archivo["tmp_name"]);
+        public function onlyUrl($archivo){
+            if($this->isImg($archivo)){
+                $this->upload();
+                
+                return $this->getUrl();
+            }else{
+                return false;
+            }
+        }
+
+        public function isImg($archivo){
+            if(isset($archivo) or strpos($archivo['imagen']['type'], "jpg") or strpos($archivo['imagen']['type'], "jpeg") or strpos($archivo['imagen']['type'], "png")){
+                $this->archivo = $archivo;
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        public function upload(){
+            if(isset($this->archivo)){
+                $host = "Apis"; 
+                $llave = "6a33a65820643f57a4a0a9c814817ca0";
+
+                $bin = file_get_contents($this->archivo["tmp_name"]);
                 $base64 = base64_encode($bin);
 
-                //Si quieres que la imagen expire, puedes usar un parametro mas: "&expire=[Segundos]"
                 $post = "key=".$llave."&name=imagen".$host."&image=".urlencode($base64);
 
                 $ch =   curl_init();
@@ -81,12 +81,14 @@
                 $resultado = curl_exec($ch);
 
                 $this->json = json_decode($resultado, true);
-
-                
             }
         }
 
         public function getJson(){
             return $this->json;
+        }
+
+        public function getUrl(){
+            return $this->json['data']['url'];
         }
     }
