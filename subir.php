@@ -1,11 +1,12 @@
 <?php
-    require("api.imgbb.easyprojects.php");
-    $apiImgBB = new ApiImgBB;
-    
-    if ($apiImgBB->isImg($_FILES['imagen'])) {
-        $apiImgBB->upload();
+    require "api.imgbb.easyprojects.php";
 
-        $url = $apiImgBB->getUrl();
+    $imgBB = new ApiImgBB;
 
-        echo $url;
+    if($imgBB->isImg($_FILES['imagen'])){
+        //$imgBB->setName("KipuStudios");
+        $imgBB->upload();
+        echo $imgBB->getUrl();
+    }else{
+        echo "No es una imagen";
     }

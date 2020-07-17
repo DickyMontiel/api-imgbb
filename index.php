@@ -7,8 +7,8 @@
 </head>
 <body>
     <form action="subir.php" method="post" enctype="multipart/form-data">
-        <input type="file" name="imagen">
-        <button type="submit">Subir Imagen</button>
+        <input type="file" name="imagen" id="">
+        <button type="submit">Enviar</button>
     </form>
 </body>
 </html>

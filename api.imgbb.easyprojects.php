@@ -24,6 +24,10 @@
 
             $apiImgBB->isImage($ArchivoQueSubio); ///Devuelve un booleano True o False
 
+        Integrale un nombre predefinido con:
+            
+            $apiImgBB->setName($nombre); //Omitelo si quieres que se suba con el mismo nombre de la imagen
+
         Para subir la imagen a ImgBB usa:
 
             $apiImgBB->upload(); //Sube la imagen
@@ -43,19 +47,14 @@
         private $json;
 
         private $archivo;
+        private $nombre;
 
-        public function onlyUrl($archivo){
-            if($this->isImg($archivo)){
-                $this->upload();
-                
-                return $this->getUrl();
-            }else{
-                return false;
-            }
+        public function __construct(){
+            $this->nombre = null;
         }
 
         public function isImg($archivo){
-            if(isset($archivo) or strpos($archivo['imagen']['type'], "jpg") or strpos($archivo['imagen']['type'], "jpeg") or strpos($archivo['imagen']['type'], "png")){
+            if(isset($archivo) and (strpos($archivo['type'], "png") or strpos($archivo['type'], "jpg") or strpos($archivo['type'], "jpeg"))){
                 $this->archivo = $archivo;
                 return true;
             }else{
@@ -65,13 +64,19 @@
 
         public function upload(){
             if(isset($this->archivo)){
-                $host = "Apis"; 
                 $llave = "6a33a65820643f57a4a0a9c814817ca0";
+
+                if($this->nombre == null){
+                    $arrayName = explode(".", $this->archivo['name']);
+                    $nombre = $arrayName[0];
+                }else{
+                    $nombre = $this->nombre;
+                }
 
                 $bin = file_get_contents($this->archivo["tmp_name"]);
                 $base64 = base64_encode($bin);
 
-                $post = "key=".$llave."&name=imagen".$host."&image=".urlencode($base64);
+                $post = "key=".$llave."&name=".$nombre."&image=".urlencode($base64);
 
                 $ch =   curl_init();
                         curl_setopt($ch, CURLOPT_URL, "https://api.imgbb.com/1/upload");
@@ -82,6 +87,10 @@
 
                 $this->json = json_decode($resultado, true);
             }
+        }
+
+        public function setName($nombre){
+            $this->nombre = $nombre;
         }
 
         public function getJson(){
